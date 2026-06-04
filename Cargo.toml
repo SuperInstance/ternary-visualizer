@@ -1,0 +1,11 @@
+[package]
+name = "ternary-visualizer"
+version = "0.1.0"
+edition = "2021"
+description = "ASCII/text visualizations of ternary agent dynamics for terminals, logs, and docs"
+license = "MIT"
+repository = "https://github.com/SuperInstance/ternary-visualizer"
+keywords = ["ternary", "visualization", "ascii", "agent", "simulation"]
+categories = ["visualization", "simulation"]
+
+[dependencies]
