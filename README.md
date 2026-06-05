@@ -1,75 +1,72 @@
 # ternary-visualizer
 
-**ASCII art for ternary signals. Make the invisible visible, right in your terminal.**
+**Ternary agent dynamics visualizer — ASCII/text visualizations for terminals, logs, and docs**
 
-Not everything needs a GUI. Sometimes you just need to *see* the data — quick, dirty, in the terminal where you're already working. This crate renders ternary populations, fitness landscapes, species distributions, conservation gauges, and cascade timelines as ASCII art. Block characters, bar charts, heat maps, and sparklines. No dependencies. No rendering. Just text.
+[![ternary](https://img.shields.io/badge/ecosystem-ternary-blue)](https://github.com/orgs/SuperInstance/repositories?q=ternary)
+[![tests](https://img.shields.io/badge/tests-0-green)]()
 
-Each visualization uses the three ternary characters: `░` (avoid/empty/negative), `▒` (unknown/neutral/zero), `█` (choose/full/positive). Together they create patterns you can read at a glance — population density, species boundaries, fitness gradients, cascade propagation.
+## Overview
 
-## What's Inside
+Ternary agent dynamics visualizer — ASCII/text visualizations for terminals, logs, and docs.
 
-- **`PopulationHeatmap`** — render a ternary population grid as ASCII block characters
-- **`FitnessChart`** — bar chart of fitness values across a population
-- **`SpeciesBar`** — horizontal bars showing species distribution (avoid/unknown/choose)
-- **`ConservationGauge`** — a single-line gauge showing how well conservation laws hold
-- **`CascadeTimeline`** — show cascade events over time as a vertical timeline
-- **`StrategyGrid`** — render a strategy space as a 2D grid with ASCII cells
-- **`SummaryCard`** — a compact dashboard card combining multiple visualizations
+Provides visualization types for ternary agent populations where each agent
+can be in one of three states: **Avoid** (░), **Unknown** (▒), or **Choose** (█).
 
-## Quick Example
+## Architecture
 
-```rust
-use ternary_visualizer::*;
+- **`TernaryState`** — state enumeration
 
-// Population heatmap: see the spatial distribution
-let mut heatmap = PopulationHeatmap::new(20, 10);
-heatmap.set(5, 3, TernaryState::Choose);
-heatmap.set(6, 3, TernaryState::Choose);
-heatmap.set(5, 4, TernaryState::Avoid);
-println!("{}", heatmap.render());
-// ░░░░░░░░░░░░░░░░░░░░
-// ░░░░░░░░░░░░░░░░░░░░
-// ░░░░░░░░░░░░░░░░░░░░
-// ░░░░░░░█░░░░░░░░░░░░
-// ░░░░░░░░░░░░░░░░░░░░
-// ...
+### Key Functions
 
-// Species bar: population composition at a glance
-let bar = SpeciesBar::new(avoid_count, unknown_count, choose_count);
-println!("{}", bar.render());
-// ░░░░▒▒▒▒▒▒▒████████
+- `symbol()`
 
-// Conservation gauge: is the system healthy?
-let gauge = ConservationGauge::new(0.87); // 87% conservation
-println!("{}", gauge.render());
-// ╢████████████████░░░╣ 87%
+## Why Ternary?
+
+The balanced ternary system {-1, 0, +1} (also known as Z₃) is the mathematically optimal discrete encoding:
+- **More expressive than binary**: three states capture positive, neutral, and negative
+- **Natural for decisions**: accept/reject/abstain, buy/hold/sell, agree/disagree/neutral
+- **Self-balancing**: the 0 state acts as a universal screen, preventing pathological lock-in
+- **Z₃ cyclic dynamics**: rock-paper-scissors is the only natural coordination mechanism
+
+## Stats
+
+| Metric | Value |
+|--------|-------|
+| Lines of Rust | 39 |
+| Test count | 0 |
+| Public types | 1 |
+| Public functions | 1 |
+
+## Ecosystem
+
+This crate is part of the **[SuperInstance Ternary Fleet](https://github.com/orgs/SuperInstance/repositories?q=ternary)**:
+
+- **[ternary-core](https://github.com/SuperInstance/ternary-core)** — shared traits and Z₃ arithmetic
+- **[ternary-grid](https://github.com/SuperInstance/ternary-grid)** — spatial grid with {-1, 0, +1} cells
+- **[ternary-graph](https://github.com/SuperInstance/ternary-graph)** — ternary-weighted graph algorithms
+- **[ternary-automata](https://github.com/SuperInstance/ternary-automata)** — three-state cellular automata
+- **[ternary-compiler](https://github.com/SuperInstance/ternary-compiler)** — expression compiler and optimizer
+
+200+ crates. 4,300+ tests. One pattern.
+
+## Research Context
+
+The ternary approach connects to several active research areas:
+- **Ternary Neural Networks** (TNNs): weights constrained to {-1, 0, +1} for efficient inference
+- **Huawei's ternary chip**: 7nm ternary silicon with 60% less power consumption
+- **Active inference**: free energy minimization naturally maps to ternary action selection
+- **Cyclic dominance**: RPS dynamics maintain biodiversity in spatial ecology
+- **Z₃ group theory**: the only algebraic group on three elements is cyclic addition mod 3
+
+## Usage
+
+```toml
+[dependencies]
+ternary-visualizer = "0.1.0"
 ```
 
-## The Deeper Truth
-
-**ASCII visualization is the fastest path from data to understanding.** No build step, no rendering engine, no window system. You print text, you see patterns. The three ternary characters (░▒█) create a visual language that's immediately readable: dark regions are dense with activity, light regions are empty, the boundary between them is where things get interesting.
-
-This crate is also the most "Plato room" of all — it's a self-contained visualization toolkit that any other crate can use for debugging, logging, or documentation. Every other crate in the fleet could `println!("{}", visualize(&data))` and get instant feedback. No setup required.
-
-**Use cases:**
-- **Debugging** — visualize agent populations during development
-- **Logging** — render state snapshots in log files for post-hoc analysis
-- **Documentation** — include ASCII visualizations in READMEs and papers
-- **Terminal dashboards** — real-time monitoring of running systems
-- **Education** — show students what's happening inside the simulation
-
-## See Also
-
-- **ternary-color** — for when ASCII isn't enough (actual color output)
-- **ternary-life** — the grid CA that produces the most dramatic ASCII patterns
-- **ternary-fire** — fire grids look incredible as ASCII heatmaps
-- **ternary-vu** — audio metering (another visualization challenge)
-- **ternary-gauge** — numerical statistics that feed the gauges
-
-## Install
-
-```bash
-cargo add ternary-visualizer
+```rust
+use ternary_visualizer;
 ```
 
 ## License
