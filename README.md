@@ -1,156 +1,75 @@
 # ternary-visualizer
 
-ASCII/text visualizations of ternary agent dynamics — for terminals, logs, and docs.
+**ASCII art for ternary signals. Make the invisible visible, right in your terminal.**
 
-Pure Rust, no unsafe code, no external dependencies.
+Not everything needs a GUI. Sometimes you just need to *see* the data — quick, dirty, in the terminal where you're already working. This crate renders ternary populations, fitness landscapes, species distributions, conservation gauges, and cascade timelines as ASCII art. Block characters, bar charts, heat maps, and sparklines. No dependencies. No rendering. Just text.
 
-## Visualizations
+Each visualization uses the three ternary characters: `░` (avoid/empty/negative), `▒` (unknown/neutral/zero), `█` (choose/full/positive). Together they create patterns you can read at a glance — population density, species boundaries, fitness gradients, cascade propagation.
 
-### PopulationHeatmap
+## What's Inside
 
-Render population state as an ASCII heatmap using block characters:
+- **`PopulationHeatmap`** — render a ternary population grid as ASCII block characters
+- **`FitnessChart`** — bar chart of fitness values across a population
+- **`SpeciesBar`** — horizontal bars showing species distribution (avoid/unknown/choose)
+- **`ConservationGauge`** — a single-line gauge showing how well conservation laws hold
+- **`CascadeTimeline`** — show cascade events over time as a vertical timeline
+- **`StrategyGrid`** — render a strategy space as a 2D grid with ASCII cells
+- **`SummaryCard`** — a compact dashboard card combining multiple visualizations
 
-```
-+---------+
-|Population|
-+---------+
-|░░▒▒▒█░░▒|
-|░▒▒█░░▒░░|
-|▒░░░▒█▒░░|
-+---------+
-```
-
-- `░` = Avoid
-- `▒` = Unknown  
-- `█` = Choose
-
-### FitnessChart
-
-ASCII line chart of fitness over generations with Y-axis labels:
-
-```
- 0.90 │      █
- 0.80 │    █
- 0.70 │  █
- 0.60 │ █
- 0.50 │█
- 0.40 │
-      └─────
-       0    4
-```
-
-Or as a compact sparkline: `▁▃▄▅▇█`
-
-### SpeciesBar
-
-Horizontal bar chart showing species distribution:
-
-```
-       ┤
-Species A │████████████████████████████████████████ (50, 50%)
-Species B │██████████████████████ (30, 30%)
-Species C │██████████████ (20, 20%)
-       ┤
-       └ Total: 100
-```
-
-### ConservationGauge
-
-Visual gauge showing conservation deviation from ideal:
-
-```
-Avoid: 0.670 (target: 0.333) ⚠
-[░░░░░░░░░░░░░░░░░░░░░░░░░█│░░░░░░░░░░░░░░░·]
- 0        25        50        75       100%
-```
-
-- `│` = target position
-- `█` = actual position
-- `◆` = on target (both overlap)
-
-### CascadeTimeline
-
-Timeline showing cascade events with markers:
-
-```
-Cascade Timeline (100 generations)
-0                                                         100
-│─────────────────────────────────────────────────────────────│
-│··········▼···································●··············│
-│
- ▼ Gen   10 │ ▼ Avoid           │ mag=0.80 │ First cascade
- ● Gen   50 │ ● Equil           │ mag=0.10 │ Equilibrium
-```
-
-Event types: `▼` Avoid cascade, `▲` Choose cascade, `✕` Extinction, `★` Emergence, `●` Equilibrium
-
-### StrategyGrid
-
-Render a strategy landscape as a 2D grid with symbols:
-
-```
-   0123456789...
- 0 ░░▒▒░░▒▓█░
- 1 ░▒▓░░▒▒▓░░
- 2 ▒░░▓▓░░▒░░
-
-  · Low fitness
-  ░ Below avg
-  ▒ Average
-  ▓ Above avg
-  █ Peak fitness
-```
-
-### SummaryCard
-
-Compact one-line summary:
-
-```
-Gen 50 | Fitness 0.73 | Species: 5 | Avoid 67% | Unknown 10% | Choose 23% | Std 0.001 ✓
-```
-
-Status symbols: `✓` Healthy, `~` Warning, `⚠` Critical, `⟳` Running
-
-## Usage
+## Quick Example
 
 ```rust
 use ternary_visualizer::*;
 
-// Population heatmap
-let heatmap = PopulationHeatmap::from_counts(30, 20, 10, 10);
-println!("{}", heatmap.render_with_border(Some("Population")));
+// Population heatmap: see the spatial distribution
+let mut heatmap = PopulationHeatmap::new(20, 10);
+heatmap.set(5, 3, TernaryState::Choose);
+heatmap.set(6, 3, TernaryState::Choose);
+heatmap.set(5, 4, TernaryState::Avoid);
+println!("{}", heatmap.render());
+// ░░░░░░░░░░░░░░░░░░░░
+// ░░░░░░░░░░░░░░░░░░░░
+// ░░░░░░░░░░░░░░░░░░░░
+// ░░░░░░░█░░░░░░░░░░░░
+// ░░░░░░░░░░░░░░░░░░░░
+// ...
 
-// Fitness chart
-let chart = FitnessChart::new(vec![0.1, 0.3, 0.5, 0.7, 0.9]);
-println!("{}", chart.render());
-println!("Sparkline: {}", chart.render_sparkline());
-
-// Species bar chart
-let bar = SpeciesBar::new(vec![("Alpha", 50), ("Beta", 30), ("Gamma", 20)]);
+// Species bar: population composition at a glance
+let bar = SpeciesBar::new(avoid_count, unknown_count, choose_count);
 println!("{}", bar.render());
+// ░░░░▒▒▒▒▒▒▒████████
 
-// Conservation gauge
-let gauge = ConservationGauge::new("Avoid", 0.333, 0.333);
+// Conservation gauge: is the system healthy?
+let gauge = ConservationGauge::new(0.87); // 87% conservation
 println!("{}", gauge.render());
+// ╢████████████████░░░╣ 87%
+```
 
-// Cascade timeline
-let events = vec![
-    CascadeEvent { generation: 10, label: "Cascade".into(), magnitude: 0.8, event_type: CascadeEventType::AvoidCascade },
-];
-let timeline = CascadeTimeline::new(events, 100);
-println!("{}", timeline.render());
+## The Deeper Truth
 
-// Strategy grid
-let grid = StrategyGrid::from_fitness(vec![vec![0.1, 0.5, 0.9], vec![0.3, 0.7, 0.2]]);
-println!("{}", grid.render());
+**ASCII visualization is the fastest path from data to understanding.** No build step, no rendering engine, no window system. You print text, you see patterns. The three ternary characters (░▒█) create a visual language that's immediately readable: dark regions are dense with activity, light regions are empty, the boundary between them is where things get interesting.
 
-// Summary card
-let card = SummaryCard::new(50, 0.73)
-    .species(5)
-    .population(67.0, 10.0, 23.0)
-    .std_deviation(0.001)
-    .auto_status();
-println!("{}", card.render());
+This crate is also the most "Plato room" of all — it's a self-contained visualization toolkit that any other crate can use for debugging, logging, or documentation. Every other crate in the fleet could `println!("{}", visualize(&data))` and get instant feedback. No setup required.
+
+**Use cases:**
+- **Debugging** — visualize agent populations during development
+- **Logging** — render state snapshots in log files for post-hoc analysis
+- **Documentation** — include ASCII visualizations in READMEs and papers
+- **Terminal dashboards** — real-time monitoring of running systems
+- **Education** — show students what's happening inside the simulation
+
+## See Also
+
+- **ternary-color** — for when ASCII isn't enough (actual color output)
+- **ternary-life** — the grid CA that produces the most dramatic ASCII patterns
+- **ternary-fire** — fire grids look incredible as ASCII heatmaps
+- **ternary-vu** — audio metering (another visualization challenge)
+- **ternary-gauge** — numerical statistics that feed the gauges
+
+## Install
+
+```bash
+cargo add ternary-visualizer
 ```
 
 ## License
