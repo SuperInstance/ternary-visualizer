@@ -9,3 +9,4 @@ keywords = ["ternary", "visualization", "ascii", "agent", "simulation"]
 categories = ["visualization", "simulation"]
 
 [dependencies]
+ternary-types = { git = "https://github.com/SuperInstance/ternary-types.git", features = ["std"] }
